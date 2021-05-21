@@ -37,7 +37,8 @@ if ($env:UserName -match "workspaceone")
 	# Set language and regional settings based on Language.xml file
 	# With WS1 Dropship online, language settings should be applied after the provisioning step because of sysprep resealing. So we will use a scheduled task to apply the xml and reboot the device before the first user logon.  
 
-	$XMLfile = "Language.xml"
+	$XMLfile = "Language_FR.xml"
+	
 	if ($config.Config.Language) {
 		Write-Host "Configuring language using: $XMLfile"
 		Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$($installFolder)$XMLfile)"
