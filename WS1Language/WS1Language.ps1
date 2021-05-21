@@ -39,37 +39,33 @@ if ($details.CsUserName -match "workspaceone")
 
 	$XMLfile = "Language_FR.xml"
 	
-	if ($config.Config.Language) {
-		Write-Host "Configuring language using: $XMLfile"
-		Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$($installFolder)$XMLfile)"
-		& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"$($installFolder)$XMLfile`""
+	Write-Host "Configuring language using: $XMLfile"
+	Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$($installFolder)$XMLfile)"
+	& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"$($installFolder)$XMLfile`""
 
-		# Check to see if already scheduled
-		$existingTask = Get-ScheduledTask -TaskName "WS1Language" -ErrorAction SilentlyContinue
-		if ($null -ne $existingTask)
-		{
-			Write-Host "Scheduled task already exists."
-		}
-		else { 
-			# Copy WS1Language script and xml to $WorkingDir
-			Copy-Item "$PSScriptRoot\WS1Language.ps1" "$WorkingDir\WS1Language.ps1" -Force
-			Copy-Item "$PSScriptRoot\$XMLfile" "$WorkingDir\Language.xml" -Force
-
-			# Create the scheduled task action
-			$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-NoProfile -ExecutionPolicy bypass -WindowStyle Hidden -File $WorkingDir\WS1Language.ps1"
-
-			# Create the scheduled task trigger
-			$triggers = @()
-			$triggers += New-ScheduledTaskTrigger -AtStartup
-			
-			# Register the scheduled task
-			Register-ScheduledTask -User SYSTEM -Action $action -Trigger $triggers -TaskName "WS1Language" -Description "WS1Language" -Force
-			Write-Host "Scheduled task created."
-		}
+	# Check to see if already scheduled
+	$existingTask = Get-ScheduledTask -TaskName "WS1Language" -ErrorAction SilentlyContinue
+	if ($null -ne $existingTask)
+	{
+		Write-Host "Scheduled task already exists."
 	}
-	else {
-		Write-Host "Language config item does not exist"
+	else { 
+		# Copy WS1Language script and xml to $WorkingDir
+		Copy-Item "$PSScriptRoot\WS1Language.ps1" "$WorkingDir\WS1Language.ps1" -Force
+		Copy-Item "$PSScriptRoot\$XMLfile" "$WorkingDir\Language.xml" -Force
+
+		# Create the scheduled task action
+		$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-NoProfile -ExecutionPolicy bypass -WindowStyle Hidden -File $WorkingDir\WS1Language.ps1"
+
+		# Create the scheduled task trigger
+		$triggers = @()
+		$triggers += New-ScheduledTaskTrigger -AtStartup
+		
+		# Register the scheduled task
+		Register-ScheduledTask -User SYSTEM -Action $action -Trigger $triggers -TaskName "WS1Language" -Description "WS1Language" -Force
+		Write-Host "Scheduled task created."
 	}
+
 
 	# Add language related features on demand ONLINE (fonts, others requirements ...). Check here: https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-language-fod
 	$currentWU = (Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" -ErrorAction Ignore).UseWuServer
