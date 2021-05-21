@@ -9,6 +9,7 @@ if ("$env:PROCESSOR_ARCHITEW6432" -ne "ARM64")
 }
 
 $WorkingDir = "$($env:ProgramData)\Airwatch\WS1Language"
+$details = Get-ComputerInfo
 
 # Create a tag file just so WS1 knows this was installed
 if (-not (Test-Path $WorkingDir))
@@ -16,14 +17,13 @@ if (-not (Test-Path $WorkingDir))
     Mkdir $WorkingDir
 }
 Set-Content -Path "$WorkingDir\WS1Language.ps1.tag" -Value "Installed"
-
-if ($env:UserName -match "workspaceone")
+if ($details.CsUserName -match "workspaceone")
 {
 	# Dropship Provisioning environment detected. script part. 1
 	# Start logging
 	Start-Transcript "$WorkingDir\WS1Language_Provisioning.log"
 		
-	Write-host "Logged-on user is $env:UserName, Dropship Provisioning environment detected. Apply language packs and create scheduled task"
+	Write-host "Logged-on user is $($details.CsUserName), Dropship Provisioning environment detected. Apply language packs and create scheduled task"
 
 	$installFolder = "$PSScriptRoot\"
 	Write-Host "Install folder: $installFolder"
@@ -95,7 +95,7 @@ else {
 	# Start logging
 	Start-Transcript "$WorkingDir\WS1Language_Customer.log"
 	
-	Write-host "Customer environment detected. Apply language and regional settings, remove scheduled task then reboot"
+	Write-host "Logged-on user is $($details.CsUserName), Customer environment detected. Apply language and regional settings, remove scheduled task then reboot"
 	Write-Host "Configuring language using: $WorkingDir\Language.xml"
 	Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$WorkingDir\Language.xml"
 	#& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"$WorkingDir\Language.xml`""
