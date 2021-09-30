@@ -1,4 +1,5 @@
 # WS1Language
+This script is intended to setup Windows devices with *Workspace One Dropship* provisioning  (*Online* or *Offline*)
 A script to add additional language(s) and setup the regional settings, including default user and logon screen. 
 
 ## ⚙️ Capabilities
@@ -13,6 +14,9 @@ A script to add additional language(s) and setup the regional settings, includin
 - Configure language settings. Adding a language pack isn't enough - you have to tell Windows that you want it to be configured for all users. This is done through an XML file fed to INTL.CPL; customize the file as needed. (There is an example file for French language). Check the Microsoft documentation for detailed settings per country or location :  https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/configure-international-settings-in-windows
 - Install features on demand (FOD). The needed components will be downloaded from Windows Update automatically and added to the running OS.Check https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-language-fod
   - Example : Language.Fonts.PanEuropeanSupplementalFonts\~\~\~\~0.0.1.0
+- Script detect if the environment is Dropship Offline or Online :
+  - If Online : apply Language Packs and xml file, then create a scheduled task to silently reboot before first logon. This reboot is required to display the logon UI in the targeted language. 
+  - If Offline : apply Language Packs only. 
 
 ## 💾 Building
 1. Download script from Github
