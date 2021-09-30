@@ -17,6 +17,26 @@ if (-not (Test-Path $WorkingDir))
     Mkdir $WorkingDir
 }
 Set-Content -Path "$WorkingDir\WS1Language.ps1.tag" -Value "Installed"
+
+if ($details.CsUserName -match "Administrator") {
+	# Dropship Offline environment detected. Apply CABs files only !
+	# Start logging
+	Start-Transcript "$WorkingDir\WS1Language_Provisioning.log"
+		
+	Write-host "Logged-on user is $($details.CsUserName), Dropship OFFLINE environment detected. Apply language packs only"
+
+	$installFolder = "$PSScriptRoot\"
+	Write-Host "Install folder: $installFolder"
+
+	# Add language packs
+	Get-ChildItem "$($installFolder)LPs" -Filter *.cab | ForEach-Object {
+		Write-Host "Adding language pack: $($_.FullName)"
+		Add-WindowsPackage -Online -NoRestart -PackagePath $_.FullName
+	}
+	Stop-Transcript
+	exit
+}
+
 if ($details.CsUserName -match "workspaceone")
 {
 	# Dropship Provisioning environment detected. script part. 1
