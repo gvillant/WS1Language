@@ -11,6 +11,12 @@ if ("$env:PROCESSOR_ARCHITEW6432" -ne "ARM64")
 $WorkingDir = "$($env:ProgramData)\Airwatch\WS1Language"
 $details = Get-ComputerInfo
 
+# PREP: Load the Config.xml
+$installFolder = "$PSScriptRoot\"
+Write-Host "Install folder: $installFolder"
+Write-Host "Loading configuration: $($installFolder)Config.xml"
+[Xml]$config = Get-Content "$($installFolder)Config.xml"
+
 # Create a tag file just so WS1 knows this was installed
 if (-not (Test-Path $WorkingDir))
 {
@@ -33,6 +39,20 @@ if ($details.CsUserName -match "Administrator") {
 		Write-Host "Adding language pack: $($_.FullName)"
 		Add-WindowsPackage -Online -NoRestart -PackagePath $_.FullName
 	}
+
+	# Set time zone (if specified)
+	if ($config.Config.TimeZone) {
+		Write-Host "Setting time zone: $($config.Config.TimeZone)"
+		Set-Timezone -Id $config.Config.TimeZone
+	}
+	else {
+		# Enable location services so the time zone will be set automatically (even when skipping the privacy page in OOBE) when an administrator signs in
+		Write-Host "Enable location services so the time zone will be set automatically"
+		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Type "String" -Value "Allow" -Force
+		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Type "DWord" -Value 1 -Force
+		Start-Service -Name "lfsvc" -ErrorAction SilentlyContinue
+	}
+
 	Stop-Transcript
 	exit
 }
@@ -55,9 +75,9 @@ if ($details.CsUserName -match "workspaceone")
 	}
 
 	# Set language and regional settings based on Language.xml file
-	# With WS1 Dropship online, language settings should be applied after the provisioning step because of sysprep resealing. So we will use a scheduled task to apply the xml and reboot the device before the first user logon.  
+	# With WS1 Dropship online, language settings should be applied after the provisioning step because of cleanup scripts. So we will use a scheduled task to apply the xml and reboot the device before the first user logon.  
 
-	$XMLfile = "Language_FR.xml"
+	$XMLfile = $config.Config.Language
 	
 	Write-Host "Configuring language using: $XMLfile"
 	Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$($installFolder)$XMLfile)"
@@ -104,6 +124,20 @@ if ($details.CsUserName -match "workspaceone")
 		Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"  -Name "UseWuServer" -Value 1
 		Restart-Service wuauserv
 	}
+	
+	# Set time zone (if specified)
+	if ($config.Config.TimeZone) {
+		Write-Host "Setting time zone: $($config.Config.TimeZone)"
+		Set-Timezone -Id $config.Config.TimeZone
+	}
+	else {
+		# Enable location services so the time zone will be set automatically (even when skipping the privacy page in OOBE) when an administrator signs in
+		Write-Host "Enable location services so the time zone will be set automatically"
+		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Type "String" -Value "Allow" -Force
+		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Type "DWord" -Value 1 -Force
+		Start-Service -Name "lfsvc" -ErrorAction SilentlyContinue
+	}
+
 	Stop-Transcript
 }
 else {
