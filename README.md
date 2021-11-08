@@ -11,6 +11,8 @@ A script to add additional language(s) and setup the regional settings, includin
   - *Microsoft-Windows-LanguageFeatures-Speech-fr-fr-Package\~31bf3856ad364e35~amd64\~\~.cab*
   - *Microsoft-Windows-LanguageFeatures-TextToSpeech-fr-fr-Package\~31bf3856ad364e35~amd64\~\~.cab*
 
+- Setup the timezone (if a timezone is specified in the Config.xml file)
+
 - The script detects if the environment is Dropship Offline or Online :
   - If Online : apply Language Packs and xml file, then create a scheduled task to silently reboot before first logon. This reboot is required to display the logon UI in the targeted language. 
   - If Offline : apply Language Packs only. 
@@ -24,8 +26,9 @@ A script to add additional language(s) and setup the regional settings, includin
 1. Download script package [here](https://github.com/gvillant/WS1Language/archive/refs/heads/main.zip)
 2. Add *CABs* files to the *LPs* folder
 3. <ins>For Dropship online</ins>, edit *Language.xml* to setup your specific languages values
-4. <ins>For Dropship online</ins>, edit *WS1Language.ps1* file to update variables to: 
+4. <ins>For Dropship online</ins>, edit *Config.xml* file to update variables to: 
    - Specify the name of your *Language.xml* file, if required,
+   - Specify the timezone,
    - Add Features-on-Demand, if required
 5. Zip the folder (without "extra" root folder, ie the ps1 file script should be at the higher level) then create a WS1 application with following settings:
 

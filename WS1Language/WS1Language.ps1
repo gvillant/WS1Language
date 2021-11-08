@@ -1,3 +1,22 @@
+<#
+.SYNOPSIS
+This script is intended to setup Windows devices with Workspace One Dropship provisioning (Online or Offline) 
+The script install additional language(s) files (.cab), setup the regional settings and timezone , including default user and logon screen.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
+.DESCRIPTION
+The script detects if the environment is Dropship Offline or Online :
+If Online : apply Language Packs and Language.xml file and timezone, then create a scheduled task to silently reboot before first logon. This reboot is required to display the logon UI in the targeted language.
+If Offline : apply Language Packs and timezone only.
+Setup the Config.xml file to specify the timezone and the Language.xml file. 
+
+.EXAMPLE
+Should be packaged in WS1 with the following cmdline : 	powershell.exe -noprofile -executionpolicy bypass -file .\WS1Language.ps1
+#>
+
 # If we are running as a 32-bit process on an x64 system, re-launch as a 64-bit process
 if ("$env:PROCESSOR_ARCHITEW6432" -ne "ARM64")
 {
