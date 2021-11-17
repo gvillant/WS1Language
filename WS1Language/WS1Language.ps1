@@ -1,4 +1,12 @@
 <#
+.VERSION 1.3
+
+.RELEASENOTES
+Version 1.0 (25/05/2021): Initial version
+Version 1.1 (25/05/2021): Dropship offline support
+Version 1.2 (08/11/2021): Timezone support
+Version 1.3 (17/11/2021): Improved current username detection
+
 .SYNOPSIS
 This script is intended to setup Windows devices with Workspace One Dropship provisioning (Online or Offline) 
 The script install additional language(s) files (.cab), setup the regional settings and timezone , including default user and logon screen.
@@ -43,7 +51,7 @@ if (-not (Test-Path $WorkingDir))
 }
 Set-Content -Path "$WorkingDir\WS1Language.ps1.tag" -Value "Installed"
 
-if ($details.CsUserName -match "Administrator") {
+if (($details.CsUserName -match "Administrator") -or ($env:Username -match "Administrator")) {
 	# Dropship Offline environment detected. Apply CABs files only !
 	# Start logging
 	Start-Transcript "$WorkingDir\WS1Language_Provisioning.log"
